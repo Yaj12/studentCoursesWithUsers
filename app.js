@@ -18,10 +18,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(session({
+  secret: 'SomeRandomString',
+  resave: true,
+  saveUninitialized:false,
+  cookie: {
+    secure: false,
+    maxAge: 6*60*60*1000
+  }
+}));
+const {passport} = require('../middleware/passport');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use(function(req, res, next){
+  if (req.user){
+    res.locals.user = req.user;
+  }
+  next();
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
