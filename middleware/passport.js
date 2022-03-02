@@ -3,7 +3,7 @@ const {Strategy} = require('passport-local').Strategy;
 const {User} = require('../models');
 const md5 = require('md5');
 
-async function validateUSer(username, password, done){
+async function validateUser(username, password, done){
     const user = await User.findOne({
         where: {
             email: username,
@@ -33,7 +33,9 @@ passport.serializeUser(function(user, done){
 });
 
 passport.deserializeUser(async function(user, done){
-    const userModel = await User.findByPk(user.id);
+    const userModel = await User.findByPk(user.id, {
+        include: ['student', 'staff']
+    });
     process.nextTick(function(){
         return done(null, userModel);
     });
